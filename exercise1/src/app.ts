@@ -45,6 +45,8 @@ function main() {
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement | null
 	if(!canvas){console.error("no canvas"); return}
 
+	resize(canvas)
+
 	const gl = canvas.getContext("webgl2")
 	if(!gl){console.error("no context"); return}
 
@@ -69,8 +71,8 @@ function main() {
 
 	const positions = [
 		0, 0,
-		0, 1,
-		1, 0,
+		0, -canvas.height,
+		canvas.width, 0,
 	]
 
 	const positionsBuffer = gl.createBuffer()
@@ -89,14 +91,13 @@ function main() {
 		0					//offset
 	)
 
-	//3 - Resize and clear canvas
-	console.info("Resizing canvas...")
-	resize(canvas)
+	const resolutionLocation = gl.getUniformLocation(program, "u_resolution")
+	gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
+
+	//3 - draw
+	console.info("Drawing...")
 	gl.clearColor(0,0,0,0)
 	gl.clear(gl.COLOR_BUFFER_BIT)
-
-	//4 - draw
-	console.info("Drawing...")
 	gl.drawArrays(gl.TRIANGLES, 0, 3)
 
 }
