@@ -77,11 +77,25 @@ function main() {
 
 	var positionBuffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-	// three 2d points
+	console.log(canvas.width, canvas.height)
+	resize(gl.canvas)
+	// triangle
+	/*
 	var positions = [
 		0, 0,
-		0, 0.5,
-		0.7, 0,
+		canvas.width, canvas.height,
+		0, canvas.height,
+	]
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
+	*/
+	// Rectangle
+	var positions = [
+		20, 20,
+		canvas.width-20, canvas.height-20,
+		0, canvas.height,
+		20, 20,
+		canvas.width, 0,
+		canvas.width-20, canvas.height-20,
 	]
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
 
@@ -95,7 +109,6 @@ function main() {
 	var offset = 0        // start at the beginning of the buffer
 	gl.vertexAttribPointer(
 		positionAttributeLocation, size, type, normalize, stride, offset)
-	resize(gl.canvas)
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 	// Clear the canvas
 	gl.clearColor(0, 0, 0, 0)
@@ -104,10 +117,12 @@ function main() {
     gl.useProgram(program)
 	// Bind the attribute/buffer set we want.
 	gl.bindVertexArray(vao)
+	const resolutionLocation = gl.getUniformLocation(program, "u_resolution")
+	gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
 
 	var primitiveType = gl.TRIANGLES
 	var offset = 0
-	var count = 3
+	var count = 6
 	gl.drawArrays(primitiveType, offset, count)
 }
 
