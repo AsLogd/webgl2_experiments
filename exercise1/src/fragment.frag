@@ -4,11 +4,12 @@
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
 
-//uniform vec4 u_color;
+uniform vec4 u_color;
 
 // we need to declare an output for the fragment shader
 out vec4 outColor;
 
 void main() {
-	outColor = vec4(1,0,0,1);
+	outColor = u_color;
+	//outColor = vec4(1,0,0,1);
 }
