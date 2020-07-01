@@ -35,6 +35,17 @@ export default class Mat4 {
 		])
 	}
 
+	static Perspective(fieldOfViewInRadians: number, aspect: number, near: number, far: number): Mat4 {
+		const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians)
+    	const rangeInv = 1.0 / (near - far)
+		return new Mat4([
+			f / aspect, 0, 0, 0,
+			0, f, 0, 0,
+			0, 0, (near + far) * rangeInv, -1,
+			0, 0, near * far * rangeInv * 2, 0
+		])
+	}
+
 	static Ortho(left, right, bottom, top, near, far): Mat4 {
 		return new Mat4([
 			2 / (right - left), 0, 0, 0,

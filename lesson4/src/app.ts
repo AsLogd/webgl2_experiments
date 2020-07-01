@@ -6,6 +6,7 @@ import fragmentShaderSource from "./fragment.frag"
 enum PLoc {
 	MATRIX 		= "u_matrix",
 	COLOR 		= "u_color",
+	FUDGE 		= "u_fudgeFactor",
 	POSITION 	= "a_position"
 }
 type Locations = {[loc in PLoc]: number | WebGLUniformLocation}
@@ -18,6 +19,7 @@ let vao: WebGLVertexArrayObject
 const locs: Locations = {
 	[PLoc.MATRIX]: -1,
 	[PLoc.COLOR]: -1,
+	[PLoc.FUDGE]: -1,
 	[PLoc.POSITION]: -1,
 }
 let keymap: Keymap = {}
@@ -53,7 +55,7 @@ function update(gl: WebGL2RenderingContext, program: WebGLProgram, dt: number) {
 		rotation = (rotation - dt/1000)
 	}
 
-	transform.translate(translation[0], translation[1], 20)
+	transform.translate(translation[0], translation[1], -350)
 	transform.xRotate(rotation)
 
 }
@@ -337,16 +339,11 @@ function init(gl: WebGL2RenderingContext, program: WebGLProgram) {
 
 	const transformLocation = gl.getUniformLocation(program, "u_matrix")
 	if(!transformLocation) {console.error("No transform attribute"); return}
-	transform = Mat4.Ortho(0, gl.canvas.width, gl.canvas.height, 0, 400, -400)
+	transform = Mat4.Perspective(45, gl.canvas.width / gl.canvas.height, 0.1, 2000)
 	locs[PLoc.MATRIX] = transformLocation
 	gl.uniformMatrix4fv(locs[PLoc.MATRIX], false, new Float32Array(transform.values))
 
-	/*
-	const colorLocation = gl.getUniformLocation(program, "u_color")
-	if(!colorLocation) {console.error("No color location"); return}
-	locs[PLoc.COLOR] = colorLocation
-	gl.uniform4f(colorLocation, 1,0,0,1)
-*/
+
 	const positionBuffer = gl.createBuffer()
 	const positionLocation = gl.getAttribLocation(program, "a_position")
 	locs[PLoc.POSITION] = positionLocation
@@ -374,7 +371,7 @@ function draw(gl: WebGL2RenderingContext, program: WebGLProgram, dt: number) {
 	gl.clearColor(0, 0, 0, 0)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	transform = Mat4.Ortho(0, gl.canvas.width, gl.canvas.height, 0, 400, -400)
+	transform = Mat4.Perspective(45, gl.canvas.width / gl.canvas.height, 0.1, 2000)
 	update(gl, program, dt)
 
 	gl.uniformMatrix4fv(locs[PLoc.MATRIX], false, new Float32Array(transform.values))
