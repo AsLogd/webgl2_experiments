@@ -1,10 +1,12 @@
+import Vec3 from "./Vec3"
+
 export default class Mat4 {
 	values: number[]
-	private constructor(values: number[]) {
+	constructor(values: number[]) {
 		this.values = values
 	}
 
-	static copy(a: Mat4): Mat4{
+	static Copy(a: Mat4): Mat4{
 		return new Mat4([...a.values])
 	}
 
@@ -93,6 +95,42 @@ export default class Mat4 {
 		])
 	}
 
+	/** Something multipled by this, will orient it
+	 * to 'to' assuming it's in position 'from'
+	 */
+	static LookAt(from: Vec3, to: Vec3, up?: Vec3): Mat4{
+		const upAxis = up ? up.copy() : Vec3.Up()
+		const zAxis = from.copy()
+			.sub(to)
+			.normalize()
+		const xAxis = Vec3.Cross(upAxis, zAxis)
+		const yAxis = Vec3.Cross(zAxis, xAxis)
+
+		const [xX, xY, xZ] = xAxis.values
+		const [yX, yY, yZ] = yAxis.values
+		const [zX, zY, zZ] = zAxis.values
+		const [fX, fY, fZ] = from.values
+
+		return new Mat4([
+			xX, xY, xZ, 0,
+			yX, yY, yZ, 0,
+			zX, zY, zZ, 0,
+			fX, fY, fZ, 1
+		])
+	}
+
+	copy(): Mat4 {
+		return Mat4.Copy(this)
+	}
+
+	position(): Vec3 {
+		return new Vec3(
+			this.values[3 * 4 + 0],
+			this.values[3 * 4 + 1],
+			this.values[3 * 4 + 2]
+		)
+	}
+
 	translate(x: number, y: number, z:number): Mat4 {
 		this.multiply(Mat4.Translate(x, y, z))
 		return this
@@ -115,6 +153,12 @@ export default class Mat4 {
 
 	zRotate(radians: number): Mat4 {
 		this.multiply(Mat4.ZRotate(radians))
+		return this
+	}
+
+	lookAt(target: Vec3, up?: Vec3): Mat4 {
+		const pos = this.position()
+		this.values = Mat4.LookAt(pos, target, up).values
 		return this
 	}
 
