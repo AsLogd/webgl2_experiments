@@ -186,3 +186,5 @@ document.addEventListener("keydown", handleKeyDown)
 document.addEventListener("keyup", handleKeyUp)
 
 createProgramAndDraw(vertexShaderSource, fragmentShaderSource, init, draw)
+
+//Next : https://webgl2fundamentals.org/webgl/lessons/webgl-less-code-more-fun.html
